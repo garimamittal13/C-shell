@@ -31,7 +31,7 @@ void handle_input(char *input) {
         while (*cmd == ' ' || *cmd == '\t') cmd++;  // Remove leading spaces
 
         // Resolve alias before execution
-        cmd = (char *)resolve_alias(cmd);
+        cmd = (char *)resolve_alias(cmd); //how does it work?
 
         int background = 0;
         char *bg_position = strchr(cmd, '&');

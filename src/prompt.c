@@ -4,15 +4,13 @@
 #include <unistd.h>
 #include <limits.h>
 #include <string.h>
+#include "commandhandler.h"
 #include "color.h" // Include the color header
 
 #ifndef HOST_NAME_MAX
 #define HOST_NAME_MAX 255
 #endif
 
-#ifndef PATH_MAX
-#define PATH_MAX 4096
-#endif
 
 void displayPrompt()
 {
@@ -37,7 +35,6 @@ void displayPrompt()
     }
 
     char *home_dir = getenv("HOME");
-
     printf("\033[1;36m%s@%s:\033[0m", username, hostname); // Cyan color for username@hostname
 
     if (home_dir != NULL && strncmp(cwd, home_dir, strlen(home_dir)) == 0)
