@@ -30,11 +30,14 @@ extern BackgroundProcess bg_processes[100];
 extern int bg_count;
 
 void execute_command(char *cmd, int background);
+void execute_pipe_with_redirection(char *segments[MAX_PIPE_COMMANDS], int num_cmds);
 void execute_command_with_redirection(char *cmd);
-void execute_pipe(char *cmds[MAX_PIPE_COMMANDS][MAX_ARG], int num_cmds, int input_fd, int output_fd);
 void hopCommand(char *args[]);
 void check_background_processes();
 int is_executable(struct stat* fileStat);
+int handle_redirection(char *args[], int *input_fd, int *output_fd);
+void activitiesCommand();
+void procloreCommand(char *pid);
 void revealCommand(char *args[]);
 void mk_hop(char *dir);
 void hop_seek(char *dir);

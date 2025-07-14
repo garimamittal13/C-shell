@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inputhandler.h>
 #include "log.h"
 
 #define MAX_LOG_SIZE 15
@@ -37,21 +38,31 @@ void save_log() {
 }
 // Function to add a command to the log
 void add_to_log(char *command) {
+    // Skip commands with 'log' keyword
+    if (strstr(command, "log") != NULL)
+        return;
+
     // Skip duplicate consecutive commands
-    if (log_count > 0 && strcmp(command_log[(log_count - 1) % MAX_LOG_SIZE], command) == 0) {
+    if (log_count > 0 &&
+        strcmp(command_log[(log_count - 1) % MAX_LOG_SIZE], command) == 0) {
         return;
     }
 
-    if (log_count < MAX_LOG_SIZE) {
-        command_log[log_count] = strdup(command);
-    } else {
-        free(command_log[log_count % MAX_LOG_SIZE]); // Overwrite the oldest command
-        command_log[log_count % MAX_LOG_SIZE] = strdup(command);
+    // Write to the correct index
+    int index = log_count % MAX_LOG_SIZE;
+
+    // Free old if overwriting
+    if (log_count >= MAX_LOG_SIZE) {
+        free(command_log[index]);
     }
 
-    log_count++;
-    save_log();  // Save the log to the file after adding a new command
+    command_log[index] = strdup(command);
+    log_count++;  // ✅ Increment only after actual addition
+
+    save_log();
 }
+
+
 // Function to print the log
 void print_log() {
     for (int i = 0; i < log_count && i < MAX_LOG_SIZE; i++) {
@@ -71,12 +82,22 @@ void purge_log() {
 
 // Function to execute a command from the log
 void execute_log_command(int index) {
-    if (index < 1 || index > log_count || index > MAX_LOG_SIZE) {
-        printf("Invalid log index\n");
+    if (log_count == 0) {
+        printf("No command in log to execute.\n");
         return;
     }
 
-    char *command = command_log[(index - 1) % MAX_LOG_SIZE];
+    if (index < 1 || index > log_count || index > MAX_LOG_SIZE) {
+        printf("Invalid log index. Valid range: 1 to %d\n", log_count);
+        return;
+    }
+
+    int log_index = (log_count - index) % MAX_LOG_SIZE;
+    if (log_index < 0) log_index += MAX_LOG_SIZE; // Handle negative wrap
+
+    char *command = command_log[log_index];
     printf("Executing: %s\n", command);
-    execute_command(command, 0); // Call the execute_command function instead of system()
+    handle_input(command);  // Forward to shell input handler
 }
+
+

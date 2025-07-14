@@ -212,9 +212,7 @@ void bgCommand(char *args[])
 // Function to handle the activities command
 void activitiesCommand()
 {
-    // Sort processes in lexicographic order
     qsort(bg_processes, bg_count, sizeof(BackgroundProcess), compare_processes);
-
     // Print processes in the required format
     for (int i = 0; i < bg_count; i++)
     {
@@ -304,8 +302,7 @@ void revealCommand(char *args[])
 {
     int show_all = 0;
     int long_format = 0;
-    char *path = "."; // Default to current directory
-
+    char *path = ".";
     // Parse flags
     for (int i = 1; args[i] != NULL; i++)
     {
@@ -321,14 +318,12 @@ void revealCommand(char *args[])
             path = args[i];
         }
     }
-
     DIR *dir = opendir(path);
     if (dir == NULL)
     {
         perror("reveal");
         return;
     }
-
     struct dirent *entry;
     while ((entry = readdir(dir)) != NULL)
     {
@@ -343,10 +338,8 @@ void revealCommand(char *args[])
             perror("stat");
             continue;
         }
-
         if (long_format)
         {
-            // File type and permissions
             printf((S_ISDIR(fileStat.st_mode)) ? "d" : "-");
             printf((fileStat.st_mode & S_IRUSR) ? "r" : "-");
             printf((fileStat.st_mode & S_IWUSR) ? "w" : "-");
@@ -358,25 +351,20 @@ void revealCommand(char *args[])
             printf((fileStat.st_mode & S_IWOTH) ? "w" : "-");
             printf((fileStat.st_mode & S_IXOTH) ? "x" : "-");
             printf(" ");
-
             // Number of links
             printf("%ld ", fileStat.st_nlink);
-
             // Owner and group
             struct passwd *pw = getpwuid(fileStat.st_uid);
             struct group *gr = getgrgid(fileStat.st_gid);
             printf("%s %s ", pw->pw_name, gr->gr_name);
-
             // File size
             printf("%ld ", fileStat.st_size);
-
             // Last modified time
             char timebuf[80];
             struct tm *timeinfo = localtime(&fileStat.st_mtime);
             strftime(timebuf, sizeof(timebuf), "%b %d %H:%M", timeinfo);
             printf("%s ", timebuf);
         }
-
         // File name with color coding
         if (S_ISDIR(fileStat.st_mode))
         {
@@ -400,12 +388,10 @@ void revealCommand(char *args[])
             printf(" "); // Space for short format
         }
     }
-
     if (!long_format)
     {
         printf("\n"); // Final newline for short format
     }
-
     closedir(dir);
 }
 
@@ -647,10 +633,8 @@ void pingCommand(char *args[])
         fprintf(stderr, "Usage: ping <pid> <signal_number>\n");
         return;
     }
-
     pid_t pid = atoi(args[1]);
     int signal_number = atoi(args[2]) % 32; // Modulo 32 as per specification
-
     // Check if the process exists
     if (kill(pid, 0) == -1)
     {
@@ -664,7 +648,6 @@ void pingCommand(char *args[])
         }
         return;
     }
-
     // Send the signal
     if (kill(pid, signal_number) == -1)
     {
@@ -703,7 +686,7 @@ void execute_command(char *cmd, int background)
     argv[argc] = NULL; // Null-terminate the argument list
     if (argc == 0)
         return; // Empty command
-    // Handle 'log' command first to avoid logging it
+    
     if (strcmp(argv[0], "log") == 0)
     {
         if (argc == 1)
@@ -721,9 +704,6 @@ void execute_command(char *cmd, int background)
         }
         return;
     }
-
-    // Add the full command to the log before executing it
-    add_to_log(cmd);
 
     // Handle 'exit' command
     if (strcmp(argv[0], "exit") == 0)
@@ -817,21 +797,16 @@ void execute_command(char *cmd, int background)
     pid = fork();
     if (pid == 0)
     {
-        // Child process
-
         // Set the child process group ID to its own PID
         setpgid(0, 0);
-
         // If foreground process, take control of the terminal
         if (!background)
         {
             tcsetpgrp(STDIN_FILENO, getpid());
         }
-
         // Restore default signal handlers
         signal(SIGINT, SIG_DFL);
         signal(SIGTSTP, SIG_DFL);
-
         if (execvp(argv[0], argv) == -1)
         {
             fprintf(stderr, "ERROR: '%s' is not a valid command\n", argv[0]);
@@ -840,21 +815,14 @@ void execute_command(char *cmd, int background)
     }
     else if (pid > 0)
     {
-        // Parent process
-
         // Set the child's process group ID
         setpgid(pid, pid);
-
         if (!background)
         {
-            // Foreground process
-
             // Set the terminal's foreground process group to the child
             tcsetpgrp(STDIN_FILENO, pid);
-
             fg_pid = pid;            // Set the foreground process ID
             start_time = time(NULL); // Record start time
-
             // Wait for the child process to finish or stop
             do
             {
@@ -866,12 +834,9 @@ void execute_command(char *cmd, int background)
                     break;
                 }
             } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-
             fg_pid = -1; // Reset foreground process ID
-
             // Restore the shell as the foreground process group
             tcsetpgrp(STDIN_FILENO, shell_pgid);
-
             end_time = time(NULL); // Record end time
 
             // Calculate and print elapsed time if more than 2 seconds

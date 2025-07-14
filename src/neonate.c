@@ -15,24 +15,18 @@ int kbhit(void) {
     struct termios oldt, newt;
     int ch;
     int oldf;
-
     // Save old terminal settings
     tcgetattr(STDIN_FILENO, &oldt);
     newt = oldt;
-
     // Set terminal to non-canonical mode, no echo
     newt.c_lflag &= ~(ICANON | ECHO);
-
     // Apply new settings
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-
     // Set non-blocking read
     oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
     fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
-
     // Try to read character
     ch = getchar();
-
     if (ch != EOF) {
         // Put character back into stdin
         ungetc(ch, stdin);
@@ -40,14 +34,11 @@ int kbhit(void) {
         // Restore settings
         tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
         fcntl(STDIN_FILENO, F_SETFL, oldf);
-
         return 1;
     }
-
     // Restore settings
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
     fcntl(STDIN_FILENO, F_SETFL, oldf);
-
     return 0;
 }
 
@@ -99,7 +90,6 @@ pid_t get_most_recent_pid() {
             }
         }
     }
-
     closedir(proc);
     return recent_pid;
 }
@@ -109,15 +99,12 @@ void neonateCommand(char *args[]) {
         fprintf(stderr, "Usage: neonate -n [time_arg]\n");
         return;
     }
-
     int time_arg = atoi(args[2]);
     if (time_arg <= 0) {
         fprintf(stderr, "Invalid time argument\n");
         return;
     }
-
     printf("Press 'x' to stop\n");
-
     while (1) {
         pid_t recent_pid = get_most_recent_pid();
         if (recent_pid != -1) {
@@ -125,7 +112,6 @@ void neonateCommand(char *args[]) {
         } else {
             printf("Could not retrieve recent PID\n");
         }
-
         // Wait for time_arg seconds or until 'x' is pressed
         time_t start_time = time(NULL);
         while (1) {
@@ -135,7 +121,6 @@ void neonateCommand(char *args[]) {
                     return;
                 }
             }
-
             if (difftime(time(NULL), start_time) >= time_arg) {
                 break;
             }

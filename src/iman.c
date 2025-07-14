@@ -19,7 +19,6 @@ static curl_socket_t opensocket(void *clientp, curlsocktype purpose, struct curl
 void parsehtml(const char *str, size_t len) {
     int in_tag = 0;
     int newline_flag = 0;
-
     for (size_t i = 0; i < len; i++) {
         if (str[i] == '<') {
             in_tag = 1;
@@ -46,13 +45,11 @@ size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
 void fetchContent(const char *ip_address, const char *path) {
     CURL *curl;
     CURLcode res;
-
     curl = curl_easy_init();
     if (!curl) {
         fprintf(stderr, "Error initializing libcurl\n");
         return;
     }
-
     char url[1024];
     snprintf(url, sizeof(url), "http://%s%s", ip_address, path);
 

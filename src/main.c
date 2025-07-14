@@ -90,6 +90,7 @@ int main()
             {
                 input[len - 1] = '\0';
             }
+             // Add command to log
             check_background_processes(); // Check for background process completion
             // Handle input
             handle_input(input);
