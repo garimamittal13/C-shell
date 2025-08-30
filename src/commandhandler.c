@@ -686,7 +686,15 @@ void execute_command(char *cmd, int background)
     argv[argc] = NULL; // Null-terminate the argument list
     if (argc == 0)
         return; // Empty command
-    
+        
+    if (strcmp(argv[0], "fg") == 0) {
+        fgCommand(argv);
+        return;
+    }
+    if (strcmp(argv[0], "bg") == 0) {
+        bgCommand(argv);
+        return;
+    }
     if (strcmp(argv[0], "log") == 0)
     {
         if (argc == 1)
