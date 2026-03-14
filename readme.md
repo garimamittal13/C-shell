@@ -59,6 +59,7 @@ The shell is organized modularly so that parsing, execution, prompting, logging,
     ├── neonate.c / neonate.h
     └── iman.c / iman.h
 
+```markdown
 ## How to Run the Shell
 
 After building the project, start the shell by running:
