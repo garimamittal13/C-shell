@@ -58,11 +58,135 @@ The shell is organized modularly so that parsing, execution, prompting, logging,
     ├── myshrc.c / myshrc.h
     ├── neonate.c / neonate.h
     └── iman.c / iman.h
+```
 
-```markdown
+## Prerequisites
+
+You need:
+
+- `gcc`
+- `make`
+- `libcurl` development package
+
+### Ubuntu / Debian
+```bash
+sudo apt update
+sudo apt install build-essential libcurl4-openssl-dev
+```
+
+### Fedora
+```bash
+sudo dnf install gcc make libcurl-devel
+```
+
+### Arch Linux
+```bash
+sudo pacman -S base-devel curl
+```
+
+## Build Instructions
+
+Clone the repository:
+
+```bash
+git clone https://github.com/garimamittal13/C-shell.git
+cd C-shell
+```
+
+Build the shell:
+
+```bash
+make
+```
+
+This creates the executable:
+
+```bash
+./my_shell
+```
+
 ## How to Run the Shell
 
 After building the project, start the shell by running:
 
 ```bash
 ./my_shell
+```
+
+You should now see the custom shell prompt and can start typing commands.
+
+### Example Session
+```bash
+./my_shell
+pwd
+ls
+echo hello
+```
+
+### Running Commands in Background
+```bash
+sleep 10 &
+```
+
+### Using Pipes
+```bash
+ls | wc
+cat file.txt | grep hello
+```
+
+### Using Redirection
+```bash
+echo hello > out.txt
+sort < input.txt
+cat file.txt >> log.txt
+```
+
+### Using Built-in Commands
+```bash
+seek filename
+proclore
+neonate
+iman seek
+```
+
+## Cleaning Build Files
+
+To remove object files and the compiled executable:
+
+```bash
+make clean
+```
+
+## Design Highlights
+
+- **Modular architecture:** parsing, execution, prompting, logging, and built-ins are implemented as separate modules.
+- **Extensible built-ins:** custom shell commands are isolated cleanly, making the shell easier to extend.
+- **Systems programming focus:** emphasizes process handling, pipes, redirection, and shell control flow in C.
+
+## Learning Outcomes
+
+Through this project, I explored:
+
+- Unix process creation and execution
+- shell command parsing
+- pipes and file descriptor redirection
+- modular systems programming in C
+- implementation of custom shell utilities
+- integrating external libraries like `libcurl`
+
+## Tech Stack
+
+- **Language:** C
+- **Build System:** Makefile
+- **Concepts:** operating systems, processes, pipes, redirection, shell design, modular programming
+
+## Future Improvements
+
+Potential extensions include:
+
+- command history navigation
+- tab completion
+- improved job control
+- aliases and environment variable expansion
+- more built-in shell utilities
+
