@@ -11,7 +11,7 @@ EXEC = my_shell
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
-	$(CC) $(CFLAGS) -o $(EXEC) $(OBJS) -lcurl  # ✅ Link libcurl here
+	$(CC) $(CFLAGS) -o $(EXEC) $(OBJS) -lcurl -lreadline
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@

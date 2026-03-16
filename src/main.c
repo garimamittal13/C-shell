@@ -9,6 +9,8 @@
 #include "log.h"
 #include "myshrc.h"
 #include <termios.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 
 pid_t shell_pid;
@@ -77,43 +79,34 @@ int main()
             perror("getcwd");
             exit(EXIT_FAILURE);
         }
-        displayPrompt();
+        // Build prompt string
+        char prompt_str[512];
+        snprintf(prompt_str, sizeof(prompt_str), "<%s@localhost:%s> ", getenv("USER"), home_dir);
 
-        char input[1024];
+        // Read user input with readline (supports history and tab completion)
+        char *input = readline(prompt_str);
 
-        // Read user input
-        if (fgets(input, sizeof(input), stdin) != NULL)
-        {
-            // Remove the newline character at the end of the input string
-            size_t len = strlen(input);
-            if (len > 0 && input[len - 1] == '\n')
-            {
-                input[len - 1] = '\0';
-            }
-             // Add command to log
-            check_background_processes(); // Check for background process completion
-            // Handle input
-            handle_input(input);
-        }
-        else
+        if (input == NULL)
         {
             // Handle EOF (Ctrl-D)
-            if (feof(stdin))
+            printf("\n");
+            // Kill all background processes before exiting
+            for (int i = 0; i < bg_count; i++)
             {
-                printf("\n");
-                // Kill all background processes before exiting
-                for (int i = 0; i < bg_count; i++)
-                {
-                    kill(bg_processes[i].pid, SIGKILL);
-                }
-                exit(0);
+                kill(bg_processes[i].pid, SIGKILL);
             }
-            else
-            {
-                perror("fgets");
-                break;
-            }
+            exit(0);
         }
+
+        // Add non-empty commands to history and process them
+        if (strlen(input) > 0)
+        {
+            add_history(input);  // Add to readline history for arrow key navigation
+            check_background_processes();  // Check for background process completion
+            handle_input(input);  // Process the command
+        }
+
+        free(input);  // readline() allocates memory that must be freed
     }
     return 0;
 }
